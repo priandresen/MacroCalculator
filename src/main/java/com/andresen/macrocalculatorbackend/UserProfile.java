@@ -1,9 +1,18 @@
 package com.andresen.macrocalculatorbackend;
 
-import java.sql.Timestamp;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+import java.time.Instant;
 import java.util.Objects;
 
+@Entity
 public class UserProfile {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private Integer userId;
     private String name;
@@ -11,10 +20,10 @@ public class UserProfile {
     private double heightCm;
     private String activityLevel;
     private double bodyFatPercentage;
-    private Timestamp createdAt;
-    private Timestamp updatedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
 
-    public UserProfile(Integer id, Integer userId, String name, double weightGrams, double heightCm, String activityLevel, double bodyFatPercentage, Timestamp createdAt, Timestamp updatedAt) {
+    public UserProfile(Integer id, Integer userId, String name, double weightGrams, double heightCm, String activityLevel, double bodyFatPercentage, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.userId = userId;
         this.name = name;
@@ -82,19 +91,19 @@ public class UserProfile {
         this.bodyFatPercentage = bodyFatPercentage;
     }
 
-    public Timestamp getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Timestamp createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Timestamp getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Timestamp updatedAt) {
+    public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
 
@@ -109,4 +118,5 @@ public class UserProfile {
     public int hashCode() {
         return Objects.hash(id, userId, name, weightGrams, heightCm, activityLevel, bodyFatPercentage, createdAt, updatedAt);
     }
+
 }

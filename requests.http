@@ -4,3 +4,17 @@ GET http://localhost:8080
 
 
 ###
+GET http://localhost:8080/user-profile
+
+###
+
+POST http://localhost:8080/user-profile
+Content-Type: application/json
+
+{
+    "bodyFatPercentage" : 0.023,
+    "heightCm" : 190,
+    "weightGrams" : 1892,
+    "activityLevel" : "active",
+    "name" :  "Jane"
+}
