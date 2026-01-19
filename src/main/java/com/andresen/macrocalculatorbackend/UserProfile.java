@@ -1,55 +1,64 @@
 package com.andresen.macrocalculatorbackend;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;
 import java.util.Objects;
 
 @Entity
+@Table(name ="user_profile")
 public class UserProfile {
+
+    protected UserProfile() {}
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-    private Integer userId;
+    private Long id;
+
+    @NotNull
+    @Column(nullable = false)
     private String name;
-    private double weightGrams;
-    private double heightCm;
-    private String activityLevel;
-    private double bodyFatPercentage;
+
+    @Column(name = "weight_grams", nullable = false)
+    private Double weightGrams;
+
+    @Column(name = "height_cm", nullable = false)
+    private Double heightCm;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "activity_level", nullable = false)
+    private ActivityLevel activityLevel;
+
+    @Column(name = "body_fat_percentage")
+    private Double bodyFatPercentage;
+
+    @Column(
+            name = "created_at",
+            insertable = false,
+            updatable = false
+    )
     private Instant createdAt;
+
+    @Column(
+            name = "updated_at",
+            insertable = false,
+            updatable = false
+    )
     private Instant updatedAt;
 
-    public UserProfile(Integer id, Integer userId, String name, double weightGrams, double heightCm, String activityLevel, double bodyFatPercentage, Instant createdAt, Instant updatedAt) {
-        this.id = id;
-        this.userId = userId;
+    public UserProfile(String name, Double weightGrams, Double heightCm, ActivityLevel activityLevel, Double bodyFatPercentage) {
         this.name = name;
         this.weightGrams = weightGrams;
         this.heightCm = heightCm;
         this.activityLevel = activityLevel;
         this.bodyFatPercentage = bodyFatPercentage;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
 
     public String getName() {
         return name;
@@ -59,35 +68,35 @@ public class UserProfile {
         this.name = name;
     }
 
-    public double getWeightGrams() {
+    public Double getWeightGrams() {
         return weightGrams;
     }
 
-    public void setWeightGrams(double weightGrams) {
+    public void setWeightGrams(Double weightGrams) {
         this.weightGrams = weightGrams;
     }
 
-    public double getHeightCm() {
+    public Double getHeightCm() {
         return heightCm;
     }
 
-    public void setHeightCm(double heightCm) {
+    public void setHeightCm(Double heightCm) {
         this.heightCm = heightCm;
     }
 
-    public String getActivityLevel() {
+    public ActivityLevel getActivityLevel() {
         return activityLevel;
     }
 
-    public void setActivityLevel(String activityLevel) {
+    public void setActivityLevel(ActivityLevel activityLevel) {
         this.activityLevel = activityLevel;
     }
 
-    public double getBodyFatPercentage() {
+    public Double getBodyFatPercentage() {
         return bodyFatPercentage;
     }
 
-    public void setBodyFatPercentage(double bodyFatPercentage) {
+    public void setBodyFatPercentage(Double bodyFatPercentage) {
         this.bodyFatPercentage = bodyFatPercentage;
     }
 
@@ -95,28 +104,23 @@ public class UserProfile {
         return createdAt;
     }
 
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
 
     public Instant getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserProfile that = (UserProfile) o;
-        return Double.compare(weightGrams, that.weightGrams) == 0 && Double.compare(heightCm, that.heightCm) == 0 && Double.compare(bodyFatPercentage, that.bodyFatPercentage) == 0 && Objects.equals(id, that.id) && Objects.equals(userId, that.userId) && Objects.equals(name, that.name) && Objects.equals(activityLevel, that.activityLevel) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
+        return id != null && Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userId, name, weightGrams, heightCm, activityLevel, bodyFatPercentage, createdAt, updatedAt);
+        return getClass().hashCode();
     }
 
 }
