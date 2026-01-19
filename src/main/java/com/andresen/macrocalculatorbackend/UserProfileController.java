@@ -17,23 +17,21 @@ public class UserProfileController {
     }
 
     @GetMapping
-    public List<UserProfile> getUserProfiles(){
+    public List<UserProfileDTO> getUserProfiles(){
         return userProfileService.getAllUserProfiles();
     }
 
-    @GetMapping("{id}")
-    public UserProfile getUserProfileById(
-            @PathVariable Integer id
+    @GetMapping("/{id}")
+    public UserProfileDTO getUserProfileById(
+            @PathVariable Long id
     ){
         return userProfileService.getUserProfileById(id);
     }
 
 
     @PostMapping
-    public void addNewUserProfile(@RequestBody UserProfile userProfile) {
-        //USUALLY YOU DONT WANT TO USE THE ENTITY
-        //what is the entity?
-        userProfileService.insertUserProfile(userProfile);
+    public UserProfileDTO addNewUserProfile(@RequestBody CreateUserProfileDTO userProfile) {
+        return userProfileService.insertUserProfile(userProfile);
 
     }
 
