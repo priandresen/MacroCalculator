@@ -15,6 +15,7 @@ public class UserProfileDTOMapper implements Function<UserProfile, UserProfileDT
                 userProfile.getWeightGrams(),
                 userProfile.getHeightCm(),
                 userProfile.getActivityLevel(),
+                userProfile.getGoal(),
                 userProfile.getBodyFatPercentage()
         );
     }

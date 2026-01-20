@@ -5,6 +5,7 @@ public record CreateUserProfileDTO(
         Double weightGrams,
         Double heightCm,
         String activityLevel,
+        String goal,
         Double bodyFatPercentage
 )
 {

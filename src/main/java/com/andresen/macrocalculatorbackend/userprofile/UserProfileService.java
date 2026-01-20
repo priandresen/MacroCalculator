@@ -31,12 +31,14 @@ public class UserProfileService {
     public UserProfileDTO insertUserProfile(CreateUserProfileDTO request) {
 
         ActivityLevel activityLevel = ActivityLevel.valueOf(request.activityLevel());
+        Goal goal = Goal.valueOf(request.goal());
 
         UserProfile userProfile = new UserProfile(
                 request.name(),
                 request.weightGrams(),
                 request.heightCm(),
                 activityLevel,
+                goal,
                 request.bodyFatPercentage()
         );
 

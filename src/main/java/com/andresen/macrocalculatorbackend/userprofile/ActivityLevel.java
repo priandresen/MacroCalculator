@@ -6,8 +6,4 @@ public enum ActivityLevel {
     ACTIVE,
     VERY_ACTIVE;
 
-    public enum GoalType {
-        LOSE_FAT,
-        GAIN_MUSCLE
-    }
 }

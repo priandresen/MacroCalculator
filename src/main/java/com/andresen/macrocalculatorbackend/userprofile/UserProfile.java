@@ -30,6 +30,10 @@ public class UserProfile {
     @Column(name = "activity_level", nullable = false)
     private ActivityLevel activityLevel;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "goal", nullable = false)
+    private Goal goal;
+
     @Column(name = "body_fat_percentage")
     private Double bodyFatPercentage;
 
@@ -47,12 +51,13 @@ public class UserProfile {
     )
     private Instant updatedAt;
 
-    public UserProfile(String name, Double weightGrams, Double heightCm, ActivityLevel activityLevel, Double bodyFatPercentage) {
+    public UserProfile(String name, Double weightGrams, Double heightCm, ActivityLevel activityLevel, Goal goal, Double bodyFatPercentage) {
         this.name = name;
         this.weightGrams = weightGrams;
         this.heightCm = heightCm;
         this.activityLevel = activityLevel;
         this.bodyFatPercentage = bodyFatPercentage;
+        this.goal = goal;
     }
 
     public Long getId() {
@@ -90,6 +95,14 @@ public class UserProfile {
 
     public void setActivityLevel(ActivityLevel activityLevel) {
         this.activityLevel = activityLevel;
+    }
+
+    public Goal getGoal() {
+        return goal;
+    }
+
+    public void setGoal(Goal goal) {
+        this.goal = goal;
     }
 
     public Double getBodyFatPercentage() {

@@ -7,6 +7,7 @@ public record UserProfileDTO(
         Double weightGrams,
         Double heightCm,
         ActivityLevel activityLevel,
+        Goal goal,
         Double bodyFatPercentage
 ) {
 }
