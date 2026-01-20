@@ -1,4 +1,4 @@
-package com.andresen.macrocalculatorbackend;
+package com.andresen.macrocalculatorbackend.userprofile;
 
 public enum ActivityLevel {
     SEDENTARY,
