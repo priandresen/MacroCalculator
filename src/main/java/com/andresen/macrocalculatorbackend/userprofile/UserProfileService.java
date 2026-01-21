@@ -1,5 +1,6 @@
 package com.andresen.macrocalculatorbackend.userprofile;
 
+import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,7 +51,7 @@ public class UserProfileService {
     public UserProfileDTO getUserProfileById(Long id) {
         return userProfileRepository.findById(id)
                 .map(userProfileDTOMapper)
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new ConfigDataResourceNotFoundException(
                         "user with id [%s] not found".formatted(id)
                 ));
     }
