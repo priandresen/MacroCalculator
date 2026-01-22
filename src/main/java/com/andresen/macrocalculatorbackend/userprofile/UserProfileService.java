@@ -1,5 +1,6 @@
 package com.andresen.macrocalculatorbackend.userprofile;
 
+import com.andresen.macrocalculatorbackend.exception.ResourceNotFoundException;
 import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -31,8 +32,8 @@ public class UserProfileService {
 
     public UserProfileDTO insertUserProfile(CreateUserProfileDTO request) {
 
-        ActivityLevel activityLevel = ActivityLevel.valueOf(request.activityLevel());
-        Goal goal = Goal.valueOf(request.goal());
+        ActivityLevel activityLevel = request.activityLevel();
+        Goal goal = request.goal();
 
         UserProfile userProfile = new UserProfile(
                 request.name(),
@@ -51,7 +52,8 @@ public class UserProfileService {
     public UserProfileDTO getUserProfileById(Long id) {
         return userProfileRepository.findById(id)
                 .map(userProfileDTOMapper)
-                .orElseThrow(() -> new ConfigDataResourceNotFoundException(
+                .orElseThrow(() -> new ResourceNotFoundException
+                        (
                         "user with id [%s] not found".formatted(id)
                 ));
     }

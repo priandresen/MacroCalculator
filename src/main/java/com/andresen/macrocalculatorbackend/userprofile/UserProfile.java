@@ -1,6 +1,7 @@
 package com.andresen.macrocalculatorbackend.userprofile;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;
@@ -16,7 +17,7 @@ public class UserProfile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
+    @NotEmpty(message = "Name may not be empty")
     @Column(nullable = false)
     private String name;
 

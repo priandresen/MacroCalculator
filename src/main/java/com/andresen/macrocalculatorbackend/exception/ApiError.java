@@ -1,7 +1,6 @@
 package com.andresen.macrocalculatorbackend.exception;
 
 import java.time.Instant;
-import java.util.List;
 
 public record ApiError(
         Instant timestamp,
@@ -9,13 +8,21 @@ public record ApiError(
         String error,
         String message,
         String path,
-        List<FieldError> fieldErrors
+        String field,
+        String fieldError
 ) {
     public static ApiError basic(int status, String error, String message, String path) {
-        return new ApiError(Instant.now(), status, error, message, path, null);
+        return new ApiError(Instant.now(), status, error, message, path, null, null);
     }
 
-    public static ApiError withFieldErrors(int status, String error, String message, String path, List<FieldError> fieldErrors) {
-        return new ApiError(Instant.now(), status, error, message, path, fieldErrors);
+    public static ApiError withFieldError(
+            int status,
+            String error,
+            String message,
+            String path,
+            String field,
+            String fieldError
+    ) {
+        return new ApiError(Instant.now(), status, error, message, path, field, fieldError);
     }
 }

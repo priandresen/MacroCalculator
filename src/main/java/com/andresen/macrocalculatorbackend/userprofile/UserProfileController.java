@@ -1,5 +1,9 @@
 package com.andresen.macrocalculatorbackend.userprofile;
 
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,9 +32,9 @@ public class UserProfileController {
 
 
     @PostMapping
-    public UserProfileDTO addNewUserProfile(@RequestBody CreateUserProfileDTO userProfile) {
-        return userProfileService.insertUserProfile(userProfile);
-
+    public ResponseEntity<UserProfileDTO> addNewUserProfile(@Valid @RequestBody CreateUserProfileDTO userProfile) {
+        UserProfileDTO createdUser = userProfileService.insertUserProfile(userProfile);
+        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }
 
 }
