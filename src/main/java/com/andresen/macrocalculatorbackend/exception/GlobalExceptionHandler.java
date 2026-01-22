@@ -1,4 +1,3 @@
-
 package com.andresen.macrocalculatorbackend.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,146 +15,159 @@ import tools.jackson.databind.exc.MismatchedInputException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    // Keep your "one-field" API shape, but make behavior consistent & easy to extend.
+    private static final String VALIDATION_FAILED = "Validation failed";
+    private static final String INVALID_REQUEST_BODY = "Invalid request body.";
+
     // 400 - request validation errors (@Valid)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest req) {
-
         FieldError fe = ex.getBindingResult().getFieldError();
 
-        // Can happen in edge cases (e.g., only global errors)
         if (fe == null) {
-            ApiError body = ApiError.basic(
-                    HttpStatus.BAD_REQUEST.value(),
-                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                    "Validation failed",
-                    req.getRequestURI()
-            );
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+            return respondBasic(HttpStatus.BAD_REQUEST, VALIDATION_FAILED, req);
         }
 
-        ApiError body = ApiError.withFieldError(
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                "Validation failed",
-                req.getRequestURI(),
+        return respondField(
+                HttpStatus.BAD_REQUEST,
+                VALIDATION_FAILED,
+                req,
                 fe.getField(),
                 fe.getDefaultMessage()
         );
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
+    // 400 - unreadable JSON / bad types / enum values
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiError> handleNotReadable(HttpMessageNotReadableException ex, HttpServletRequest req) {
-        String message = "Invalid request body.";
+        JsonProblem problem = extractJsonProblem(ex);
+
+        if (problem.field() == null) {
+            return respondBasic(HttpStatus.BAD_REQUEST, problem.message(), req);
+        }
+
+        return respondField(
+                HttpStatus.BAD_REQUEST,
+                problem.message(),
+                req,
+                problem.field(),
+                problem.fieldError()
+        );
+    }
+
+    // 400 - bad input
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiError> handleIllegalInput(IllegalArgumentException ex, HttpServletRequest req) {
+        // In production, you might want to normalize messages here (avoid leaking internals).
+        return respondBasic(HttpStatus.BAD_REQUEST, ex.getMessage(), req);
+    }
+
+    // 404 - not found
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiError> handleNotFound(ResourceNotFoundException ex, HttpServletRequest req) {
+        return respondBasic(HttpStatus.NOT_FOUND, ex.getMessage(), req);
+    }
+
+    // 409 - database constraint violations
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiError> handleDataIntegrity(DataIntegrityViolationException ex, HttpServletRequest req) {
+        String msg = resolveIntegrityMessage(ex);
+        return respondBasic(HttpStatus.CONFLICT, msg, req);
+    }
+
+    // 500 - safety net
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> handleUnexpected(Exception ex, HttpServletRequest req) {
+        // Production: log ex with stacktrace + request id (if you have one).
+        return respondBasic(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected server error", req);
+    }
+
+    // -------------------------
+    // Response builders
+    // -------------------------
+
+    private ResponseEntity<ApiError> respondBasic(HttpStatus status, String message, HttpServletRequest req) {
+        ApiError body = ApiError.basic(
+                status.value(),
+                status.getReasonPhrase(),
+                message,
+                req.getRequestURI()
+        );
+        return ResponseEntity.status(status).body(body);
+    }
+
+    private ResponseEntity<ApiError> respondField(HttpStatus status, String message, HttpServletRequest req, String field, String fieldError) {
+        ApiError body = ApiError.withFieldError(
+                status.value(),
+                status.getReasonPhrase(),
+                message,
+                req.getRequestURI(),
+                field,
+                fieldError
+        );
+        return ResponseEntity.status(status).body(body);
+    }
+
+    // -------------------------
+    // JSON parsing helpers
+    // -------------------------
+
+    private JsonProblem extractJsonProblem(HttpMessageNotReadableException ex) {
+        // Default: unknown/unreadable JSON
+        String message = INVALID_REQUEST_BODY;
         String field = null;
         String fieldError = null;
 
         Throwable cause = ex.getCause();
-        System.out.println(cause);
-        System.out.println(cause.getClass());
-
-        if (cause instanceof InvalidFormatException ife) {
-            field = lastPathFieldName(ife);
-
-            Class<?> targetType = ife.getTargetType();
-            if (targetType != null && targetType.isEnum()) {
-                String allowed = enumAllowedValues(targetType);
-                message = "Invalid enum value.";
-                fieldError = (field != null)
-                        ? "Allowed values: " + allowed
-                        : "Allowed values: " + allowed;
-            } else {
-                message = "Invalid value type.";
-                fieldError = (field != null)
-                        ? "Invalid value for " + field + "."
-                        : "Invalid value.";
-            }
-        } else if (cause instanceof MismatchedInputException mie) {
-            field = lastPathFieldName(mie);
-            message = "Invalid value type.";
-            fieldError = (field != null)
-                    ? "Invalid value for " + field + "."
-                    : "Invalid value.";
+        if (cause == null) {
+            return new JsonProblem(message, field, fieldError);
         }
 
-        ApiError body = (field == null)
-                ? ApiError.basic(400, "Bad Request", message, req.getRequestURI())
-                : ApiError.withFieldError(400, "Bad Request", message, req.getRequestURI(), field, fieldError);
+        // Wrong type / invalid enum / invalid value
+        if (cause instanceof InvalidFormatException ife) {
+            field = lastPathFieldName(ife);
+            return jsonProblemFromInvalidFormat(ife, field);
+        }
 
-        return ResponseEntity.badRequest().body(body);
+        // Missing fields / wrong shape / type mismatch
+        if (cause instanceof MismatchedInputException mie) {
+            field = lastPathFieldName(mie);
+            message = "Invalid value type.";
+            fieldError = (field != null) ? ("Invalid value for " + field + ".") : "Invalid value.";
+            return new JsonProblem(message, field, fieldError);
+        }
+
+        // Any other parsing exception: keep default
+        return new JsonProblem(message, field, fieldError);
+    }
+
+    private JsonProblem jsonProblemFromInvalidFormat(InvalidFormatException ife, String field) {
+        Class<?> targetType = ife.getTargetType();
+
+        // Enum value that doesn't exist
+        if (targetType != null && targetType.isEnum()) {
+            String allowed = enumAllowedValues(targetType);
+            String message = "Invalid enum value.";
+            String fieldError = "Allowed values: " + allowed;
+            return new JsonProblem(message, field, fieldError);
+        }
+
+        // Other type mismatch (e.g., string into number)
+        String message = "Invalid value type.";
+        String fieldError = (field != null) ? ("Invalid value for " + field + ".") : "Invalid value.";
+        return new JsonProblem(message, field, fieldError);
     }
 
     private String enumAllowedValues(Class<?> enumType) {
         Object[] constants = enumType.getEnumConstants();
         if (constants == null) return "";
+
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < constants.length; i++) {
             if (i > 0) sb.append(", ");
             sb.append(constants[i].toString());
         }
         return sb.toString();
-    }
-
-
-    // 400 - bad input (your own checks)
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiError> handleIllegalInput(IllegalArgumentException ex, HttpServletRequest req) {
-        ApiError body = ApiError.basic(
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                ex.getMessage(),
-                req.getRequestURI()
-        );
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
-    }
-
-    // 404 - not found
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiError> handleNotFound(ResourceNotFoundException ex, HttpServletRequest req) {
-        ApiError body = ApiError.basic(
-                HttpStatus.NOT_FOUND.value(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
-                ex.getMessage(),
-                req.getRequestURI()
-        );
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
-    }
-
-    // 409 - database constraint violations
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ApiError> handleDataIntegrity(DataIntegrityViolationException ex, HttpServletRequest req) {
-
-        String msg = "Request conflicts with existing data.";
-        String mostSpecificMessage = ex.getMostSpecificCause() != null ? ex.getMostSpecificCause().getMessage() : null;
-
-        if (mostSpecificMessage != null) {
-            if (mostSpecificMessage.contains("macro_goal_one_active_per_user")) {
-                msg = "User already has an active macro goal. Deactivate the current one before creating a new active goal.";
-            }
-        }
-
-        ApiError body = ApiError.basic(
-                HttpStatus.CONFLICT.value(),
-                HttpStatus.CONFLICT.getReasonPhrase(),
-                msg,
-                req.getRequestURI()
-        );
-
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
-    }
-
-    // 500 - safety net
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> handleUnexpected(Exception ex, HttpServletRequest req) {
-        // Production: log ex with stacktrace
-        ApiError body = ApiError.basic(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                "Unexpected server error",
-                req.getRequestURI()
-        );
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 
     /**
@@ -165,7 +177,7 @@ public class GlobalExceptionHandler {
     private String lastPathFieldName(MismatchedInputException ex) {
         if (ex.getPath() == null || ex.getPath().isEmpty()) return null;
 
-        var last = ex.getPath().get(ex.getPath().size() - 1);
+        var last = ex.getPath().getLast();
 
         // For JSON objects: "activityLevel"
         String prop = last.getPropertyName();
@@ -176,4 +188,27 @@ public class GlobalExceptionHandler {
         return (idx >= 0) ? String.valueOf(idx) : null;
     }
 
+    // -------------------------
+    // DataIntegrity helpers
+    // -------------------------
+
+    private String resolveIntegrityMessage(DataIntegrityViolationException ex) {
+        // Default safe message
+        String msg = "Request conflicts with existing data.";
+
+        String mostSpecificMessage =
+                (ex.getMostSpecificCause() != null) ? ex.getMostSpecificCause().getMessage() : null;
+
+        if (mostSpecificMessage == null) return msg;
+
+        // Small “translation table” pattern (easy to extend)
+        if (mostSpecificMessage.contains("macro_goal_one_active_per_user")) {
+            return "User already has an active macro goal. Deactivate the current one before creating a new active goal.";
+        }
+
+        return msg;
+    }
+
+    // Small internal carrier for the JSON problem details (keeps handler readable)
+    private record JsonProblem(String message, String field, String fieldError) {}
 }

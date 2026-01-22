@@ -4,6 +4,7 @@ import jakarta.validation.constraints.*;
 
 public record CreateUserProfileDTO(
         @NotBlank(message = "Name is required")
+        @Pattern(regexp = ".*\\p{L}.*", message = "Name must contain at least one letter.")
         String name,
 
         @NotNull(message = "Weight is required")

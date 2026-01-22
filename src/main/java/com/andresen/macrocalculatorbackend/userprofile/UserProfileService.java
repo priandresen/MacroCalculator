@@ -1,7 +1,6 @@
 package com.andresen.macrocalculatorbackend.userprofile;
 
 import com.andresen.macrocalculatorbackend.exception.ResourceNotFoundException;
-import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
