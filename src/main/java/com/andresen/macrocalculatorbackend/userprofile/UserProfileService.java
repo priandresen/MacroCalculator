@@ -56,4 +56,9 @@ public class UserProfileService {
                         "user with id [%s] not found".formatted(id)
                 ));
     }
+
+//    public UserProfileDTO getUserMacros(Long id) {
+//        //TODO
+//        return "work on this";
+//    }
 }

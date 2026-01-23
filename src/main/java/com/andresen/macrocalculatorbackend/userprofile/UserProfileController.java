@@ -30,11 +30,18 @@ public class UserProfileController {
         return userProfileService.getUserProfileById(id);
     }
 
+    @GetMapping("/{id}/macros")
+    public UserProfileDTO getUserMacros(@PathVariable Long id){
+        return userProfileService.getUserProfileById(id);
+    }
+
 
     @PostMapping
     public ResponseEntity<UserProfileDTO> addNewUserProfile(@Valid @RequestBody CreateUserProfileDTO userProfile) {
         UserProfileDTO createdUser = userProfileService.insertUserProfile(userProfile);
         return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }
+
+
 
 }

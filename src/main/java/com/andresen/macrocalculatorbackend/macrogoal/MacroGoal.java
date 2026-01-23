@@ -27,13 +27,13 @@ public class MacroGoal {
     private Integer calorieTarget;
 
     @Column(name = "protein_g", nullable = false)
-    private Double proteinG;
+    private Integer proteinG;
 
     @Column(name = "carbs_g", nullable = false)
-    private Double carbsG;
+    private Integer carbsG;
 
     @Column(name = "fat_g", nullable = false)
-    private Double fatG;
+    private Integer fatG;
 
     @Column(name = "is_active", nullable = false)
     private boolean isActive;
@@ -45,7 +45,7 @@ public class MacroGoal {
     )
     private Instant createdAt;
 
-    public MacroGoal(UserProfile userProfile, Integer calorieTarget, Double proteinG, Double carbsG, Double fatG, boolean isActive) {
+    public MacroGoal(UserProfile userProfile, Integer calorieTarget, Integer proteinG, Integer carbsG, Integer fatG, boolean isActive) {
         this.userProfile = userProfile;
         this.calorieTarget = calorieTarget;
         this.proteinG = proteinG;
@@ -70,27 +70,27 @@ public class MacroGoal {
         this.calorieTarget = calorieTarget;
     }
 
-    public Double getProteinG() {
+    public Integer getProteinG() {
         return proteinG;
     }
 
-    public void setProteinG(Double proteinG) {
+    public void setProteinG(Integer proteinG) {
         this.proteinG = proteinG;
     }
 
-    public Double getCarbsG() {
+    public Integer getCarbsG() {
         return carbsG;
     }
 
-    public void setCarbsG(Double carbsG) {
+    public void setCarbsG(Integer carbsG) {
         this.carbsG = carbsG;
     }
 
-    public Double getFatG() {
+    public Integer getFatG() {
         return fatG;
     }
 
-    public void setFatG(Double fatG) {
+    public void setFatG(Integer fatG) {
         this.fatG = fatG;
     }
 
