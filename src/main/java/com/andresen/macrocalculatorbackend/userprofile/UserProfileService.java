@@ -36,6 +36,7 @@ public class UserProfileService {
 
         UserProfile userProfile = new UserProfile(
                 request.name(),
+                request.dateOfBirth(),
                 request.weightGrams(),
                 request.heightCm(),
                 activityLevel,
@@ -56,6 +57,23 @@ public class UserProfileService {
                         "user with id [%s] not found".formatted(id)
                 ));
     }
+
+    public UserProfileDTO updateUserProfile(Long id, CreateUserProfileDTO request) {
+        UserProfile existing = userProfileRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("user with id [%s] not found".formatted(id)));
+
+        existing.setName(request.name());
+        existing.setDateOfBirth(request.dateOfBirth());
+        existing.setWeightGrams(request.weightGrams());
+        existing.setHeightCm(request.heightCm());
+        existing.setActivityLevel(request.activityLevel());
+        existing.setGoal(request.goal());
+        existing.setBodyFatPercentage(request.bodyFatPercentage());
+
+        UserProfile saved = userProfileRepository.save(existing);
+        return userProfileDTOMapper.apply(saved);
+    }
+
 
 //    public UserProfileDTO getUserMacros(Long id) {
 //        //TODO

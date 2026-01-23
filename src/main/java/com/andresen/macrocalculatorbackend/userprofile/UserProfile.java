@@ -2,9 +2,9 @@ package com.andresen.macrocalculatorbackend.userprofile;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
@@ -20,6 +20,10 @@ public class UserProfile {
     @NotEmpty(message = "Name may not be empty")
     @Column(nullable = false)
     private String name;
+
+
+    @Column(name = "date_of_birth", nullable = false)
+    private LocalDate dateOfBirth;
 
     @Column(name = "weight_grams", nullable = false)
     private Double weightGrams;
@@ -38,6 +42,7 @@ public class UserProfile {
     @Column(name = "body_fat_percentage")
     private Double bodyFatPercentage;
 
+
     @Column(
             name = "created_at",
             insertable = false,
@@ -52,13 +57,14 @@ public class UserProfile {
     )
     private Instant updatedAt;
 
-    public UserProfile(String name, Double weightGrams, Double heightCm, ActivityLevel activityLevel, Goal goal, Double bodyFatPercentage) {
+    public UserProfile(String name, LocalDate dateOfBirth, Double weightGrams, Double heightCm, ActivityLevel activityLevel, Goal goal, Double bodyFatPercentage) {
         this.name = name;
+        this.dateOfBirth = dateOfBirth;
         this.weightGrams = weightGrams;
         this.heightCm = heightCm;
         this.activityLevel = activityLevel;
-        this.bodyFatPercentage = bodyFatPercentage;
         this.goal = goal;
+        this.bodyFatPercentage = bodyFatPercentage;
     }
 
     public Long getId() {
@@ -68,6 +74,14 @@ public class UserProfile {
 
     public String getName() {
         return name;
+    }
+
+    public LocalDate getDateOfBirth(){
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth){
+        this.dateOfBirth = dateOfBirth;
     }
 
     public void setName(String name) {

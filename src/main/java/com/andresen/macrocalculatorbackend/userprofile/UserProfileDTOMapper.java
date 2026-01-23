@@ -12,6 +12,7 @@ public class UserProfileDTOMapper implements Function<UserProfile, UserProfileDT
         return new UserProfileDTO(
                 userProfile.getId(),
                 userProfile.getName(),
+                userProfile.getDateOfBirth(),
                 userProfile.getWeightGrams(),
                 userProfile.getHeightCm(),
                 userProfile.getActivityLevel(),

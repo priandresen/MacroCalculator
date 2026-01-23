@@ -2,10 +2,16 @@ package com.andresen.macrocalculatorbackend.userprofile;
 
 import jakarta.validation.constraints.*;
 
+import java.time.LocalDate;
+
 public record CreateUserProfileDTO(
         @NotBlank(message = "Name is required")
         @Pattern(regexp = ".*\\p{L}.*", message = "Name must contain at least one letter.")
         String name,
+
+        @NotNull(message = "Date of birth is required")
+        @Past(message = "date must be in the past")
+        LocalDate dateOfBirth,
 
         @NotNull(message = "Weight is required")
         @Positive(message = "Weight must be greater than 0")
