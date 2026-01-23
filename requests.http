@@ -12,9 +12,14 @@ POST http://localhost:8080/user-profile
 Content-Type: application/json
 
 {
-    "bodyFatPercentage" : 0.023,
-    "heightCm" : 190,
-    "weightGrams" : 1892,
-    "activityLevel" : "active",
-    "name" :  "Jane"
+    "name" : "Ana",
+    "dateOfBirth": "2003-05-11",
+    "weightGrams" : 15,
+    "heightCm" : "123",
+    "activityLevel" : "ACTIVE",
+    "goal": "MAINTAIN"
 }
+
+###
+GET http://localhost:8080/user-profile/0
+
