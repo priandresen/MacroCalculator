@@ -4,6 +4,7 @@ import com.andresen.macrocalculatorbackend.exception.ResourceNotFoundException;
 import com.andresen.macrocalculatorbackend.shared.ActivityLevel;
 import com.andresen.macrocalculatorbackend.shared.Goal;
 import com.andresen.macrocalculatorbackend.shared.Intensity;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -33,7 +34,7 @@ public class UserProfileService {
                 .toList();
     }
 
-    public UserProfileDTO insertUserProfile(CreateUserProfileDTO request) {
+    public UserProfileDTO insertUserProfile(@NonNull CreateUserProfileDTO request) {
 
         ActivityLevel activityLevel = request.activityLevel();
         Goal goal = request.goal();
@@ -57,6 +58,8 @@ public class UserProfileService {
         return userProfileDTOMapper.apply(saved);
     }
 
+
+
     public UserProfileDTO getUserProfileById(Long id) {
         return userProfileRepository.findById(id)
                 .map(userProfileDTOMapper)
@@ -66,7 +69,7 @@ public class UserProfileService {
                         ));
     }
 
-    public UserProfileDTO updateUserProfile(Long id, CreateUserProfileDTO request) {
+    public UserProfileDTO updateUserProfile(Long id, @NonNull CreateUserProfileDTO request) {
         UserProfile existing = userProfileRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("user with id [%s] not found".formatted(id)));
 
