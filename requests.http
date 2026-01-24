@@ -13,7 +13,7 @@ Content-Type: application/json
 
 {
     "name" : "Ana",
-    "dateOfBirth": "2003-05-11",
+    "dateOfBirth": "2003-02-11",
     "weightGrams" : 15,
     "heightCm" : "123",
     "activityLevel" : "ACTIVE",
@@ -21,5 +21,5 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:8080/user-profile/0
+GET http://localhost:8080/user-profile/1/
 

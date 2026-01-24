@@ -30,8 +30,6 @@ public class UserOnboardingService {
     public UserOnboardingResponse createProfileWithActiveMacroGoal(CreateUserProfileDTO request) {
         UserProfileDTO createdProfile = userProfileService.insertUserProfile(request);
 
-        // Assumption: your UserProfileDTO contains an id getter/accessor.
-        // If it doesn't, change UserProfileService to return the saved entity or include id in the DTO.
         Long userProfileId = createdProfile.id();
 
         MacroGoal activeGoal = macroGoalService.recalculateActiveGoalFromProfile(userProfileId);

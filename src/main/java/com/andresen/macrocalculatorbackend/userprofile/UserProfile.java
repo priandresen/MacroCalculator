@@ -1,7 +1,12 @@
 package com.andresen.macrocalculatorbackend.userprofile;
 
+import com.andresen.macrocalculatorbackend.shared.ActivityLevel;
+import com.andresen.macrocalculatorbackend.shared.Goal;
+import com.andresen.macrocalculatorbackend.shared.Intensity;
+import com.andresen.macrocalculatorbackend.shared.Sex;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -21,12 +26,16 @@ public class UserProfile {
     @Column(nullable = false)
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    @NotNull(message = "Sex may not be empty")
+    @Column(nullable = false)
+    private Sex sex;
 
     @Column(name = "date_of_birth", nullable = false)
     private LocalDate dateOfBirth;
 
-    @Column(name = "weight_grams", nullable = false)
-    private Double weightGrams;
+    @Column(name = "weight_kg", nullable = false)
+    private Double weightKg;
 
     @Column(name = "height_cm", nullable = false)
     private Double heightCm;
@@ -38,6 +47,10 @@ public class UserProfile {
     @Enumerated(EnumType.STRING)
     @Column(name = "goal", nullable = false)
     private Goal goal;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "intensity", nullable = false)
+    private Intensity intensity;
 
     @Column(name = "body_fat_percentage")
     private Double bodyFatPercentage;
@@ -57,13 +70,15 @@ public class UserProfile {
     )
     private Instant updatedAt;
 
-    public UserProfile(String name, LocalDate dateOfBirth, Double weightGrams, Double heightCm, ActivityLevel activityLevel, Goal goal, Double bodyFatPercentage) {
+    public UserProfile(String name, Sex sex, LocalDate dateOfBirth, Double weightKg, Double heightCm, ActivityLevel activityLevel, Goal goal, Intensity intensity, Double bodyFatPercentage) {
         this.name = name;
+        this.sex = sex;
         this.dateOfBirth = dateOfBirth;
-        this.weightGrams = weightGrams;
+        this.weightKg = weightKg;
         this.heightCm = heightCm;
         this.activityLevel = activityLevel;
         this.goal = goal;
+        this.intensity = intensity;
         this.bodyFatPercentage = bodyFatPercentage;
     }
 
@@ -71,9 +86,20 @@ public class UserProfile {
         return id;
     }
 
-
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Sex getSex() {
+        return sex;
+    }
+
+    public void setSex(Sex sex){
+        this.sex = sex;
     }
 
     public LocalDate getDateOfBirth(){
@@ -84,16 +110,13 @@ public class UserProfile {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public void setName(String name) {
-        this.name = name;
+
+    public Double getWeightKg() {
+        return weightKg;
     }
 
-    public Double getWeightGrams() {
-        return weightGrams;
-    }
-
-    public void setWeightGrams(Double weightGrams) {
-        this.weightGrams = weightGrams;
+    public void setWeightKg(Double weightGrams) {
+        this.weightKg = weightGrams;
     }
 
     public Double getHeightCm() {
@@ -118,6 +141,14 @@ public class UserProfile {
 
     public void setGoal(Goal goal) {
         this.goal = goal;
+    }
+
+    public Intensity getIntensity() {
+        return intensity;
+    }
+
+    public void setIntensity(Intensity intensity){
+        this.intensity = intensity;
     }
 
     public Double getBodyFatPercentage() {
