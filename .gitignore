@@ -33,4 +33,8 @@ build/
 .vscode/
 
 application.yml
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8bbfbd2615805375ddc781b8a51925d63da8b1e2
 .env
