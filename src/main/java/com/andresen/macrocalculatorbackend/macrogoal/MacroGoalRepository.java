@@ -6,5 +6,6 @@ import java.util.Optional;
 
 public interface MacroGoalRepository extends JpaRepository<MacroGoal, Long> {
 
-    Optional<MacroGoal> findByUserProfileIdAndIsActiveTrue(Long userProfileId);
+    Optional<MacroGoal> findByUserProfile_IdAndIsActiveTrue(Long userProfileId);
+
 }

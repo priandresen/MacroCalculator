@@ -1,5 +1,7 @@
 package com.andresen.macrocalculatorbackend.userprofile;
 
+import com.andresen.macrocalculatorbackend.onboarding.UserOnboardingResponse;
+import com.andresen.macrocalculatorbackend.onboarding.UserOnboardingService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,9 +14,11 @@ import java.util.List;
 public class UserProfileController {
 
     private final UserProfileService userProfileService;
+    private final UserOnboardingService userOnboardingService;
 
-    public UserProfileController(UserProfileService userProfileService) {
+    public UserProfileController(UserProfileService userProfileService, UserOnboardingService userOnboardingService) {
         this.userProfileService = userProfileService;
+        this.userOnboardingService = userOnboardingService;
     }
 
     @GetMapping
@@ -31,14 +35,23 @@ public class UserProfileController {
 
     @GetMapping("/{id}/macros")
     public UserProfileDTO getUserMacros(@PathVariable Long id){
+
         return userProfileService.getUserProfileById(id);
     }
 
 
+//    @PostMapping
+//    public ResponseEntity<UserProfileDTO> addNewUserProfile(@Valid @RequestBody CreateUserProfileDTO userProfile) {
+//        UserProfileDTO createdUser = userProfileService.insertUserProfile(userProfile);
+//        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+//    }
+
     @PostMapping
-    public ResponseEntity<UserProfileDTO> addNewUserProfile(@Valid @RequestBody CreateUserProfileDTO userProfile) {
-        UserProfileDTO createdUser = userProfileService.insertUserProfile(userProfile);
-        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+    public ResponseEntity<UserOnboardingResponse> createUserProfile(
+            @Valid @RequestBody CreateUserProfileDTO request
+    ) {
+        UserOnboardingResponse created =  userOnboardingService.createProfileWithActiveMacroGoal(request);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
 

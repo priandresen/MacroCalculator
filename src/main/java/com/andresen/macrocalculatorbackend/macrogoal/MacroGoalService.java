@@ -19,13 +19,16 @@ public class MacroGoalService {
 
     private final UserProfileRepository userProfileRepository;
     private final MacroGoalRepository macroGoalRepository;
+    private final MacroGoalDTOMapper macroGoalDTOMapper;
 
     public MacroGoalService(
             UserProfileRepository userProfileRepository,
-            MacroGoalRepository macroGoalRepository
+            MacroGoalRepository macroGoalRepository,
+            MacroGoalDTOMapper macroGoalDTOMapper
     ) {
         this.userProfileRepository = userProfileRepository;
         this.macroGoalRepository = macroGoalRepository;
+        this.macroGoalDTOMapper = macroGoalDTOMapper;
     }
 
     public MacroGoal createMacroGoal(Long userProfileId, CreateMacroGoalDTO request) {
@@ -51,27 +54,23 @@ public class MacroGoalService {
      * Automatic path: derive goal from the profile and ensure it's the ONLY active goal.
      */
     @Transactional
-    public MacroGoal recalculateActiveGoalFromProfile(Long userProfileId) {
+    public MacroGoalDTO recalculateActiveGoalFromProfile(Long userProfileId) {
         UserProfile userProfile = userProfileRepository
                 .findById(userProfileId)
                 .orElseThrow(() -> new ResourceNotFoundException("User profile not found"));
 
-        // 1) Deactivate the current active goal (if any)
+        //Deactivate the current active goal
         Optional<MacroGoal> existingActive =
-                macroGoalRepository.findByUserProfileIdAndIsActiveTrue(userProfileId);
+                macroGoalRepository.findByUserProfile_IdAndIsActiveTrue(userProfileId);
 
         existingActive.ifPresent(activeGoal -> {
             activeGoal.setActive(false);
             macroGoalRepository.save(activeGoal);
         });
 
-        // 2) Compute the new goal from the profile
-        // NOTE: I can't fill in the real formula without your calculation rules,
-        // so I'm leaving a clear TODO.
-
         CalculatedMacros macros = calculateFromProfile(userProfile);
 
-        // 3) Save a new active goal
+        //  Save a new active goal
         MacroGoal newActive = new MacroGoal(
                 userProfile,
                 macros.calories(),
@@ -81,8 +80,25 @@ public class MacroGoalService {
                 true
         );
 
-        return macroGoalRepository.save(newActive);
+
+        MacroGoal saved =  macroGoalRepository.save(newActive);
+        return macroGoalDTOMapper.apply(saved);
     }
+
+    public MacroGoal getActiveMacroGoalByUserId(Long userProfileId) {
+
+        if (!userProfileRepository.existsById(userProfileId)) {
+            throw new ResourceNotFoundException("User profile not found");
+        }
+
+        return macroGoalRepository
+                .findByUserProfile_IdAndIsActiveTrue(userProfileId)
+                .orElseThrow(() -> new IllegalStateException(
+                        "No active MacroGoal for userProfileId=" + userProfileId
+                ));
+    }
+
+
 
     private int calculateBasalCalories(UserProfile userProfile) {
         Sex sex = userProfile.getSex();
@@ -150,7 +166,6 @@ public class MacroGoalService {
         };
     }
 
-
 //        if (userProfile.getGoal() == Goal.GAIN_MUSCLE){
 //            targetCalorie += (int) (targetCalorie*0.15);
 //        } else if (userProfile.getGoal() == Goal.LOSE_FAT){
@@ -178,8 +193,8 @@ public class MacroGoalService {
 
         int targetCalorie = calculateTargetCaloriesToGoalAfterIntensity(userProfile);
 
-        int protein = (int) Math.round(userProfile.getWeightKg() * 1.6);
-        int fat = (int) Math.round(userProfile.getWeightKg() * 1.0);
+        int protein = (int) Math.round(userProfile.getWeightKg() * 2);
+        int fat = (int) Math.round(userProfile.getWeightKg() * 0.9);
 
         int carbs = targetCalorie - ((protein * 4) + (fat * 9));
         carbs = carbs / 4;
@@ -199,4 +214,6 @@ public class MacroGoalService {
             Integer carbsG,
             Integer fatG
     ) {}
+
+
 }

@@ -36,6 +36,19 @@ public class GlobalExceptionHandler {
                 fe.getDefaultMessage()
         );
     }
+//            FieldError fieldError = ex.getBindingResult().getFieldError();
+//
+//            ApiError error = ApiError.withFieldError(
+//                    HttpStatus.BAD_REQUEST.value(),
+//                    "Bad Request",
+//                    "Validation failed",
+//                    req.getRequestURI(),
+//                    fieldError != null ? fieldError.getField() : null,
+//                    fieldError != null ? fieldError.getDefaultMessage() : null
+//            );
+//
+//            return ResponseEntity.badRequest().body(error);
+//        }
 
     // 400 - unreadable JSON / bad types / enum values
     @ExceptionHandler(HttpMessageNotReadableException.class)

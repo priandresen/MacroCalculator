@@ -1,6 +1,6 @@
 package com.andresen.macrocalculatorbackend.onboarding;
 
-import com.andresen.macrocalculatorbackend.macrogoal.MacroGoal;
+import com.andresen.macrocalculatorbackend.macrogoal.MacroGoalDTO;
 import com.andresen.macrocalculatorbackend.macrogoal.MacroGoalService;
 import com.andresen.macrocalculatorbackend.userprofile.CreateUserProfileDTO;
 import com.andresen.macrocalculatorbackend.userprofile.UserProfileDTO;
@@ -32,7 +32,7 @@ public class UserOnboardingService {
 
         Long userProfileId = createdProfile.id();
 
-        MacroGoal activeGoal = macroGoalService.recalculateActiveGoalFromProfile(userProfileId);
+        MacroGoalDTO activeGoal = macroGoalService.recalculateActiveGoalFromProfile(userProfileId);
 
         return new UserOnboardingResponse(createdProfile, activeGoal);
     }
@@ -47,7 +47,7 @@ public class UserOnboardingService {
             CreateUserProfileDTO request
     ) {
         UserProfileDTO updatedProfile = userProfileService.updateUserProfile(userProfileId, request);
-        MacroGoal activeGoal = macroGoalService.recalculateActiveGoalFromProfile(userProfileId);
+        MacroGoalDTO activeGoal = macroGoalService.recalculateActiveGoalFromProfile(userProfileId);
         return new UserOnboardingResponse(updatedProfile, activeGoal);
     }
 }
