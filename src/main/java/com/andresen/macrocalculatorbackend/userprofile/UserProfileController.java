@@ -1,5 +1,7 @@
 package com.andresen.macrocalculatorbackend.userprofile;
 
+import com.andresen.macrocalculatorbackend.macrogoal.MacroGoalDTO;
+import com.andresen.macrocalculatorbackend.macrogoal.MacroGoalService;
 import com.andresen.macrocalculatorbackend.onboarding.UserOnboardingResponse;
 import com.andresen.macrocalculatorbackend.onboarding.UserOnboardingService;
 import jakarta.validation.Valid;
@@ -15,10 +17,12 @@ public class UserProfileController {
 
     private final UserProfileService userProfileService;
     private final UserOnboardingService userOnboardingService;
+    private final MacroGoalService macroGoalService;
 
-    public UserProfileController(UserProfileService userProfileService, UserOnboardingService userOnboardingService) {
+    public UserProfileController(UserProfileService userProfileService, UserOnboardingService userOnboardingService, MacroGoalService macroGoalService) {
         this.userProfileService = userProfileService;
         this.userOnboardingService = userOnboardingService;
+        this.macroGoalService = macroGoalService;
     }
 
     @GetMapping
@@ -34,9 +38,9 @@ public class UserProfileController {
     }
 
     @GetMapping("/{id}/macros")
-    public UserProfileDTO getUserMacros(@PathVariable Long id){
+    public MacroGoalDTO getUserMacros(@PathVariable Long id){
 
-        return userProfileService.getUserProfileById(id);
+        return macroGoalService.getActiveMacroGoalByUserId(id);
     }
 
 

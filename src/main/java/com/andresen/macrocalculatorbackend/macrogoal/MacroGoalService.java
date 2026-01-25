@@ -85,17 +85,19 @@ public class MacroGoalService {
         return macroGoalDTOMapper.apply(saved);
     }
 
-    public MacroGoal getActiveMacroGoalByUserId(Long userProfileId) {
+    public MacroGoalDTO getActiveMacroGoalByUserId(Long userProfileId) {
 
         if (!userProfileRepository.existsById(userProfileId)) {
             throw new ResourceNotFoundException("User profile not found");
         }
 
-        return macroGoalRepository
+        MacroGoal activeGoal = macroGoalRepository
                 .findByUserProfile_IdAndIsActiveTrue(userProfileId)
                 .orElseThrow(() -> new IllegalStateException(
                         "No active MacroGoal for userProfileId=" + userProfileId
                 ));
+
+        return macroGoalDTOMapper.apply(activeGoal);
     }
 
 
