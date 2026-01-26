@@ -3,10 +3,14 @@ package com.andresen.macrocalculatorbackend.onboarding;
 import com.andresen.macrocalculatorbackend.macrogoal.MacroGoalDTO;
 import com.andresen.macrocalculatorbackend.macrogoal.MacroGoalService;
 import com.andresen.macrocalculatorbackend.userprofile.CreateUserProfileDTO;
+import com.andresen.macrocalculatorbackend.userprofile.UpdateUserProfileDTO;
 import com.andresen.macrocalculatorbackend.userprofile.UserProfileDTO;
 import com.andresen.macrocalculatorbackend.userprofile.UserProfileService;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
 public class UserOnboardingService {
@@ -51,4 +55,13 @@ public class UserOnboardingService {
         return new UserOnboardingResponse(updatedProfile, activeGoal);
     }
 
+    @Transactional
+    public UserOnboardingResponse patchProfileAndRecalculateActiveGoal(
+            @PathVariable Long userProfileId,
+            @Valid @RequestBody UpdateUserProfileDTO request) {
+
+        UserProfileDTO updatedProfile = userProfileService.patchUserProfile(userProfileId, request);
+        MacroGoalDTO activeGoal = macroGoalService.recalculateActiveGoalFromProfile(userProfileId);
+        return new UserOnboardingResponse(updatedProfile, activeGoal);
+    }
 }

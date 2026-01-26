@@ -64,7 +64,7 @@ public class UserProfileController {
         userProfileService.deleteProfileById(id);
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<UserOnboardingResponse> updateUserProfileAndMacros(
             @PathVariable Long id,
             @Valid @RequestBody CreateUserProfileDTO request){
@@ -73,6 +73,17 @@ public class UserProfileController {
 
         return ResponseEntity.ok(updated);
     }
+
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<UserOnboardingResponse> patchUserProfile(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateUserProfileDTO request
+    ) {
+        UserOnboardingResponse updated = userOnboardingService.patchProfileAndRecalculateActiveGoal(id, request);
+        return ResponseEntity.ok(updated);
+    }
+
 
 
 }

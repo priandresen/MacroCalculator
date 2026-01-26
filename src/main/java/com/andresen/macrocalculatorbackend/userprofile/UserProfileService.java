@@ -4,6 +4,7 @@ import com.andresen.macrocalculatorbackend.exception.ResourceNotFoundException;
 import com.andresen.macrocalculatorbackend.shared.ActivityLevel;
 import com.andresen.macrocalculatorbackend.shared.Goal;
 import com.andresen.macrocalculatorbackend.shared.Intensity;
+import jakarta.validation.Valid;
 import org.apache.catalina.User;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
@@ -97,4 +98,23 @@ public class UserProfileService {
     }
 
 
+    public UserProfileDTO patchUserProfile(Long id, @Valid UpdateUserProfileDTO request) {
+        UserProfile existing = userProfileRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "user with id [%s] not found".formatted(id)
+                ));
+
+        if (request.name() != null) existing.setName(request.name());
+        if (request.sex() != null) existing.setSex(request.sex());
+        if (request.dateOfBirth() != null) existing.setDateOfBirth(request.dateOfBirth());
+        if (request.weightKg() != null) existing.setWeightKg(request.weightKg());
+        if (request.heightCm() != null) existing.setHeightCm(request.heightCm());
+        if (request.activityLevel() != null) existing.setActivityLevel(request.activityLevel());
+        if (request.goal() != null) existing.setGoal(request.goal());
+        if (request.intensity() != null) existing.setIntensity(request.intensity());
+        if (request.bodyFatPercentage() != null) existing.setBodyFatPercentage(request.bodyFatPercentage());
+
+        UserProfile saved = userProfileRepository.save(existing);
+        return userProfileDTOMapper.apply(saved);
+    }
 }
