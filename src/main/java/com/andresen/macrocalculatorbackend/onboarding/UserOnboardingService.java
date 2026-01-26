@@ -50,4 +50,5 @@ public class UserOnboardingService {
         MacroGoalDTO activeGoal = macroGoalService.recalculateActiveGoalFromProfile(userProfileId);
         return new UserOnboardingResponse(updatedProfile, activeGoal);
     }
+
 }

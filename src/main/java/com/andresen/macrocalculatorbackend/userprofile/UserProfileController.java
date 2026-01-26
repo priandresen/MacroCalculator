@@ -58,6 +58,21 @@ public class UserProfileController {
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUserProfile(@PathVariable Long id){
+        userProfileService.deleteProfileById(id);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<UserOnboardingResponse> updateUserProfileAndMacros(
+            @PathVariable Long id,
+            @Valid @RequestBody CreateUserProfileDTO request){
+        UserOnboardingResponse updated =
+                userOnboardingService.updateProfileAndRecalculateActiveGoal(id, request);
+
+        return ResponseEntity.ok(updated);
+    }
 
 
 }

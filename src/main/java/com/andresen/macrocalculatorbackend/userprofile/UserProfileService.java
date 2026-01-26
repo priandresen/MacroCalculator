@@ -4,6 +4,7 @@ import com.andresen.macrocalculatorbackend.exception.ResourceNotFoundException;
 import com.andresen.macrocalculatorbackend.shared.ActivityLevel;
 import com.andresen.macrocalculatorbackend.shared.Goal;
 import com.andresen.macrocalculatorbackend.shared.Intensity;
+import org.apache.catalina.User;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -67,6 +68,14 @@ public class UserProfileService {
                         (
                                 "user with id [%s] not found".formatted(id)
                         ));
+    }
+
+    public void deleteProfileById(Long id){
+        UserProfile userProfile = userProfileRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "user with id [%s] not found".formatted(id)
+                ));
+        userProfileRepository.delete(userProfile);
     }
 
     public UserProfileDTO updateUserProfile(Long id, @NonNull CreateUserProfileDTO request) {
