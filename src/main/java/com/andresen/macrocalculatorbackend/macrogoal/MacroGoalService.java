@@ -65,7 +65,7 @@ public class MacroGoalService {
 
         existingActive.ifPresent(activeGoal -> {
             activeGoal.setActive(false);
-            macroGoalRepository.save(activeGoal);
+            macroGoalRepository.saveAndFlush(activeGoal);
         });
 
         CalculatedMacros macros = calculateFromProfile(userProfile);

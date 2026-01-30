@@ -24,5 +24,26 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:8080/user-profile/1/
+GET http://localhost:8080/user-profile/26
+
+###
+
+GET http://localhost:8080/api/foods/search?query=cheese
+
+###
+
+GET https://api.nal.usda.gov/fdc/v1/foods/search?query=cheese&api_key=GbfayhAVb24HIvQEFfkdxpVOEWlp260xEPF3wyMy
+
+
+###
+GET localhost:8080/api/foods/search?query=cheese
+
+###
+GET localhost:8080/api/foods/search/cheese
+###
+GET localhost:8080/api/foods/2008231
+
+
+
+
 

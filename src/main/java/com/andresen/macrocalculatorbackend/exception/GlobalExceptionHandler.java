@@ -224,4 +224,30 @@ public class GlobalExceptionHandler {
 
     // Small internal carrier for the JSON problem details (keeps handler readable)
     private record JsonProblem(String message, String field, String fieldError) {}
+
+
+    @ExceptionHandler(FoodMacrosNotFoundException.class)
+    public ResponseEntity<ApiError> handleFoodMacrosNotFound(
+            FoodMacrosNotFoundException ex,
+            HttpServletRequest req
+    ) {
+        return respondBasic(
+                HttpStatus.NOT_FOUND,
+                ex.getMessage(),
+                req
+        );
+    }
+
+    @ExceptionHandler(UnsupportedFoodTypeException.class)
+    public ResponseEntity<ApiError> handleUnsupportedFoodType(
+            UnsupportedFoodTypeException ex,
+            HttpServletRequest req
+    ) {
+        return respondBasic(
+                HttpStatus.valueOf(422),
+                ex.getMessage(),
+                req
+        );
+    }
+
 }
