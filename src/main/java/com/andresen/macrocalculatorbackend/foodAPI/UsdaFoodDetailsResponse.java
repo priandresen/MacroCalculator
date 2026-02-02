@@ -9,5 +9,15 @@ public record UsdaFoodDetailsResponse(
         String dataType,
         Double servingSize,
         String servingSizeUnit,
-        List<UsdaNutrientDTO> foodNutrients
-) {}
+        List<UsdaNutrientDTO> foodNutrients,
+        LabelNutrients labelNutrients
+){
+
+    public record LabelNutrients(
+            LabelValue calories
+    ) {}
+
+    public record LabelValue(
+            Double value
+    ) {}
+}

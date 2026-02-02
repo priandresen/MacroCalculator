@@ -36,12 +36,12 @@ GET https://api.nal.usda.gov/fdc/v1/foods/search?query=cheese&api_key=GbfayhAVb2
 
 
 ###
-GET localhost:8080/api/foods/search?query=cheese
+GET localhost:8080/api/foods/search?query=milk
 
 ###
 GET localhost:8080/api/foods/search/cheese
 ###
-GET localhost:8080/api/foods/2008231
+GET localhost:8080/api/foods/search/2062204
 
 
 

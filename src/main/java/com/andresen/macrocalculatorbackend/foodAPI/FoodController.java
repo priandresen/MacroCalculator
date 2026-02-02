@@ -19,7 +19,7 @@ public class FoodController {
         return service.searchFoods(query);
     }
 
-    @GetMapping("/{foodId}")
+    @GetMapping("search/{foodId}")
     public FoodDetailsDTO getDetails(@PathVariable Long foodId) {
         return service.getFoodDetails(foodId);
     }
