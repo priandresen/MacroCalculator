@@ -96,7 +96,33 @@ public class FoodLog {
     }
 
     public String getBrand() { return brand; }
+
     public Double getServingSize() { return servingSize; }
+    public void setServingSize(Double servingSize){
+        if (servingSize == null) throw new IllegalArgumentException("servingSize is required");
+        if (servingSize <= 0) throw new IllegalArgumentException("servingSize must be > 0");
+        this.servingSize = servingSize;
+    }
+    public void setCalories(Integer calories) {
+        if (calories == null) throw new IllegalArgumentException("calories is required");
+        this.calories = calories;
+    }
+
+    public void setProteinG(Integer proteinG) {
+        if (proteinG == null) throw new IllegalArgumentException("proteinG is required");
+        this.proteinG = proteinG;
+    }
+
+    public void setCarbsG(Integer carbsG) {
+        if (carbsG == null) throw new IllegalArgumentException("carbsG is required");
+        this.carbsG = carbsG;
+    }
+
+    public void setFatG(Integer fatG) {
+        if (fatG == null) throw new IllegalArgumentException("fatG is required");
+        this.fatG = fatG;
+    }
+
     public String getServingUnit() { return servingUnit; }
     public Integer getCalories() { return calories; }
     public Integer getProteinG() { return proteinG; }
@@ -107,4 +133,13 @@ public class FoodLog {
         this.userDailyLog = userDailyLog;
     }
 
+    public void setServingUnit(String s) {
+        if (servingUnit == null) throw new IllegalArgumentException("servingUnit is required");
+        this.servingUnit = servingUnit;
+    }
+
+    public void setName(String name) {
+        if (name == null) throw new IllegalArgumentException("name is required");
+        this.name = name;
+    }
 }

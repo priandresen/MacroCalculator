@@ -67,7 +67,7 @@ public class UserDailyLog {
             FoodLog f = it.next();
             if (foodLogId.equals(f.getId())) {
                 it.remove();
-                f.setUserDailyLog(null); // critical: orphan => deleted on flush/commit
+                f.setUserDailyLog(null);
                 return true;
             }
         }

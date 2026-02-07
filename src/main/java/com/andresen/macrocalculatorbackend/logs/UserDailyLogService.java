@@ -1,9 +1,13 @@
 package com.andresen.macrocalculatorbackend.logs;
 
+import com.andresen.macrocalculatorbackend.exception.ResourceNotFoundException;
 import com.andresen.macrocalculatorbackend.foodAPI.FoodDetailsDTO;
 import com.andresen.macrocalculatorbackend.foodAPI.FoodService;
+import com.andresen.macrocalculatorbackend.userprofile.UpdateUserProfileDTO;
 import com.andresen.macrocalculatorbackend.userprofile.UserProfile;
+import com.andresen.macrocalculatorbackend.userprofile.UserProfileDTO;
 import com.andresen.macrocalculatorbackend.userprofile.UserProfileRepository;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,13 +28,6 @@ public class UserDailyLogService {
         this.userRepo = userRepo;
     }
 
-    @Transactional(readOnly = true)
-    public DailyLogDTO getDailyLog(Long userId, LocalDate date) {
-        UserDailyLog log = repo.findByUserIdAndDateWithFoods(userId, date)
-                .orElseThrow(() -> new IllegalArgumentException("Daily log not found"));
-        return mapper.toDTO(log);
-    }
-
     @Transactional
     public void deleteFoodLog(Long dailyLogId, Long foodLogId) {
         UserDailyLog log = repo.findByIdWithFoods(dailyLogId)
@@ -40,7 +37,33 @@ public class UserDailyLogService {
         if (!removed) {
             throw new IllegalArgumentException("Food log not found");
         }
+    }
 
+    @Transactional
+    public FoodLogDTO getFoodLog(Long dailyLogId, Long foodLogId){
+        UserDailyLog log = repo.findByIdWithFoods(dailyLogId)
+                .orElseThrow(() -> new IllegalArgumentException("Daily log not found"));
+
+        FoodLog foodLog = log.getFoodLogs().stream()
+                .filter(f -> f.getId().equals(foodLogId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Food log not found"));
+
+        return mapper.toFoodDTO(foodLog);
+    }
+
+    @Transactional
+    public DailyLogDTO getDailyLog(Long userId, LocalDate date) {
+        UserDailyLog log = repo
+                .findByUserIdAndDateWithFoods(userId, date)
+                .orElseGet(() -> {
+                    UserProfile user = userRepo.findById(userId)
+                            .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+                    UserDailyLog newLog = new UserDailyLog(date, user);
+                    return repo.save(newLog);
+                });
+        return mapper.toDTO(log);
     }
 
     @Transactional
@@ -91,8 +114,45 @@ public class UserDailyLogService {
         return (int) Math.round(base * factor);
     }
 
+    @Transactional
+    public FoodLogDTO patchFoodLog(Long dailyLogId, Long foodLogId, @Valid UpdateFoodLogDTO request) {
+        UserDailyLog log = repo.findByIdWithFoods(dailyLogId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "daily log with id [%s] not found".formatted(dailyLogId)
+                ));
 
+        FoodLog foodLog = log.getFoodLogs().stream()
+                .filter(f -> f.getId().equals(foodLogId))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "food log with id [%s] not found in daily log [%s]".formatted(foodLogId, dailyLogId)
+                ));
 
+        if (request.servingSize() != null) {
+            if (foodLog.getUsdaId() == null) {
+                throw new IllegalArgumentException("Food log has no usdaId; cannot recalculate macros.");
+            }
+
+            FoodDetailsDTO details = foodService.getFoodDetails(foodLog.getUsdaId());
+
+            Double factor = request.servingSize() / details.servingSize();
+
+            foodLog.setServingSize(request.servingSize());
+            foodLog.setServingUnit(details.servingUnit());
+            foodLog.setName(details.name());
+            foodLog.setBrand(details.brand());
+
+            foodLog.setCalories(scale(details.calories(), factor));
+            foodLog.setProteinG(scale(details.protein(), factor));
+            foodLog.setCarbsG(scale(details.carbs(), factor));
+            foodLog.setFatG(scale(details.fat(), factor));
+        }
+
+        // In a transaction, dirty-checking is enough, but saving is fine for clarity
+        repo.save(log);
+
+        return mapper.toFoodDTO(foodLog);
+    }
 
 
 }

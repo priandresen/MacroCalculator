@@ -36,7 +36,7 @@ public class UserDailyLogDTOMapper {
         );
     }
 
-    private FoodLogDTO toFoodDTO(FoodLog f) {
+    public FoodLogDTO toFoodDTO(FoodLog f) {
         return new FoodLogDTO(
                 f.getId(),
                 f.getUsdaId(),

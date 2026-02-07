@@ -22,8 +22,12 @@ public class UsdaFoodClient {
                         uriBuilder
                                 .path("/foods/search")
                                 .queryParam("query", query)
-                                .queryParam("pageSize", 25)
+                                .queryParam("dataType", "Branded")
+                                .queryParam("pageSize", 200)
+                                .queryParam("pageNumber", 1, 2, 3)
                                 .queryParam("api_key", config.getApiKey())
+                                .queryParam("requireAllWords", false)
+//                                .queryParam("sortBy", "dataType.keyword")
                                 .build()
                 )
                 .retrieve()

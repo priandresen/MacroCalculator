@@ -75,11 +75,12 @@ public class FoodMapper {
         if (nutrients == null) return null;
 
         return nutrients.stream()
-                .filter(n -> n != null && n.nutrient() != null)
-                .filter(n -> ENERGY_KCAL_ID.equals(n.nutrient().id()))
-                .map(UsdaNutrientDTO::amount)
+                .filter(n -> n != null)
+                .filter(n -> ENERGY_KCAL_ID.equals(n.id()))
+                .map(UsdaNutrientDTO::amountValue)
                 .findFirst()
                 .orElse(null);
     }
+
 
 }

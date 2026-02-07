@@ -35,15 +35,29 @@ GET http://localhost:8080/api/foods/search?query=cheese
 GET https://api.nal.usda.gov/fdc/v1/foods/search?query=cheese&api_key=GbfayhAVb24HIvQEFfkdxpVOEWlp260xEPF3wyMy
 
 
-###
-GET localhost:8080/api/foods/search?query=milk
+### get food list by query/externalapi
+GET localhost:8080/api/foods/search?query=almond milk no sugar
+
+### get food by id/externalapi
+GET localhost:8080/api/foods/search/1909137
 
 ###
-GET localhost:8080/api/foods/search/cheese
-###
-GET localhost:8080/api/foods/search/2062204
+POST http://127.0.0.1:8080/user-profile/22/daily-logs/2026-02-02
+Content-Type: application/json
+
+{
+    "fdcId": 2241814,
+    "servingSize": 105
+}
+
+### get daily log for user
+GET localhost:8080/user-profile/22/daily-logs/2026-02-04
+
+### delete food log for user // update response code to 204
+DELETE localhost:8080/user-profile/22/daily-logs/3/foods/5
 
 
-
+### get specific log
+GET localhost:8080/user-profile/22/daily-logs/3/foods/4
 
 
