@@ -54,17 +54,30 @@ public class UserDailyLogService {
 
     @Transactional
     public DailyLogDTO getDailyLog(Long userId, LocalDate date) {
-        UserDailyLog log = repo
-                .findByUserIdAndDateWithFoods(userId, date)
+        UserDailyLog log = getOrCreateLog(userId, date);
+        return mapper.toDTO(log);
+    }
+
+    private UserDailyLog getOrCreateLog(Long userId, LocalDate date) {
+        return repo.findByUserIdAndDateWithFoods(userId, date)
                 .orElseGet(() -> {
+
                     UserProfile user = userRepo.findById(userId)
                             .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-                    UserDailyLog newLog = new UserDailyLog(date, user);
-                    return repo.save(newLog);
+                    try {
+
+                        return repo.save(new UserDailyLog(date, user));
+
+                    } catch (org.springframework.dao.DataIntegrityViolationException e) {
+                        return repo.findByUserIdAndDateWithFoods(userId, date)
+                                .orElseThrow(() ->
+                                        new IllegalStateException("Daily log exists but cannot be loaded", e)
+                                );
+                    }
                 });
-        return mapper.toDTO(log);
     }
+
 
     @Transactional
     public DailyLogDTO addFoodToDay(
@@ -73,15 +86,17 @@ public class UserDailyLogService {
             Long fdcId,
             Double servingSize) {
 
-        UserDailyLog log = repo
-                .findByUserIdAndDateWithFoods(userId, date)
-                .orElseGet(() -> {
-                    UserProfile user = userRepo.findById(userId)
-                            .orElseThrow(() -> new IllegalArgumentException("User not found"));
+//        UserDailyLog log = repo
+//                .findByUserIdAndDateWithFoods(userId, date)
+//                .orElseGet(() -> {
+//                    UserProfile user = userRepo.findById(userId)
+//                            .orElseThrow(() -> new IllegalArgumentException("User not found"));
+//
+//                    UserDailyLog newLog = new UserDailyLog(date, user);
+//                    return repo.save(newLog);
+//                });
 
-                    UserDailyLog newLog = new UserDailyLog(date, user);
-                    return repo.save(newLog);
-                });
+            UserDailyLog log = getOrCreateLog(userId, date);
 
         // 2. External API → internal DTO
         FoodDetailsDTO details = foodService.getFoodDetails(fdcId);
@@ -105,6 +120,8 @@ public class UserDailyLogService {
 
 
         log.addFoodItem(foodLog);
+
+        repo.save(log);
 
         return mapper.toDTO(log);
     }
