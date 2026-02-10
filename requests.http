@@ -60,4 +60,8 @@ DELETE localhost:8080/user-profile/22/daily-logs/3/foods/5
 ### get specific log
 GET localhost:8080/user-profile/22/daily-logs/3/foods/4
 
+### get deployed
+GET http://98.92.83.117:8080/user-profile
+
+
 

@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class UsdaApiConfig {
 
-    @Value("${usda.api.base-url}")
+    @Value("${usda.api.base}")
     private String baseUrl;
 
     @Value("${usda.api.key}")
