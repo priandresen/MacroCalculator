@@ -3,13 +3,13 @@ package com.andresen.macrocalculatorbackend.logs;
 import com.andresen.macrocalculatorbackend.exception.ResourceNotFoundException;
 import com.andresen.macrocalculatorbackend.foodAPI.FoodDetailsDTO;
 import com.andresen.macrocalculatorbackend.foodAPI.FoodService;
-import com.andresen.macrocalculatorbackend.userprofile.UpdateUserProfileDTO;
 import com.andresen.macrocalculatorbackend.userprofile.UserProfile;
-import com.andresen.macrocalculatorbackend.userprofile.UserProfileDTO;
 import com.andresen.macrocalculatorbackend.userprofile.UserProfileRepository;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import jakarta.persistence.EntityManager;
+
 
 import java.time.LocalDate;
 
@@ -59,23 +59,13 @@ public class UserDailyLogService {
     }
 
     private UserDailyLog getOrCreateLog(Long userId, LocalDate date) {
+
+        repo.insertIfNotExists(userId, date);
+
         return repo.findByUserIdAndDateWithFoods(userId, date)
-                .orElseGet(() -> {
-
-                    UserProfile user = userRepo.findById(userId)
-                            .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-                    try {
-
-                        return repo.save(new UserDailyLog(date, user));
-
-                    } catch (org.springframework.dao.DataIntegrityViolationException e) {
-                        return repo.findByUserIdAndDateWithFoods(userId, date)
-                                .orElseThrow(() ->
-                                        new IllegalStateException("Daily log exists but cannot be loaded", e)
-                                );
-                    }
-                });
+                .orElseThrow(() ->
+                        new IllegalStateException("Daily log missing after insertIfNotExists")
+                );
     }
 
 
